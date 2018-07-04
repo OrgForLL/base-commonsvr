@@ -8,6 +8,18 @@
 	<packaging>jar</packaging>
 	<name>base-commonsvr</name>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>Dalston.SR4</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -22,33 +34,32 @@
 	</properties>
 
 	<dependencies>
-	
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-config</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-				
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-starter-redis</artifactId>
-		    <version>1.4.7.RELEASE</version>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-redis</artifactId>
+			<version>1.4.7.RELEASE</version>
 		</dependency>
-		
 		<dependency>
 			<groupId>com.lilanz</groupId>
-		    <artifactId>common</artifactId>
-		    <version>0.0.1-SNAPSHOT</version>
+			<artifactId>common</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -58,9 +69,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-artemis</artifactId>
 		</dependency>
+		
 	</dependencies>
 
 	<build>
+		<finalName>base-commonsvr</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
