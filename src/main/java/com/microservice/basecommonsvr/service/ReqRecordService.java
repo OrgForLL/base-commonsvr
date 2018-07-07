@@ -76,16 +76,15 @@ public class ReqRecordService {
 	 * @param key 最外层key
 	 * @param appName 服务名
 	 * @param reqid 请求id
-	 * @param tid 业务id
 	 * @return
 	 */
-	public Result<?> redisInsertInter(String appName,String reqid,int tid){
+	public Result<?> redisInsertInter(String appName,String reqid){
 		if(findReqRecord(appName + reqid)==0) {
 			ReqRecord reqRecord = new ReqRecord();
 			reqRecord.setAppid(appName);
 			reqRecord.setReqid(reqid);
 			reqRecord.setReqtime(new Date());
-			reqRecord.setTid(tid);
+			reqRecord.setTid(0);
 			reqRecord.setStatus(false);
 			putReqRecord(appName, reqRecord);
 			JSONObject jo = new JSONObject();
@@ -95,7 +94,7 @@ public class ReqRecordService {
 		}else if(findReqRecord(appName + reqid)==1) {
 			JSONObject jo = new JSONObject();
 			jo.put("reqid", true);
-			jo.put("tid", tid);
+			jo.put("tid", redisDBHelper.hashGet(appName+reqid, "tid"));
 			return ResultUtil.success(jo);
 		}else if(findReqRecord(appName + reqid)==2){
 			JSONObject jo = new JSONObject();
@@ -111,8 +110,9 @@ public class ReqRecordService {
 	}
 
 	public Result<?> redisUpdateInter(String appName, String reqid, int tid, boolean status) {
-		if(redisDBHelper.hashHasKey(appName+reqid, "status")&&Integer.parseInt(redisDBHelper.hashGet(appName+reqid, "tid").toString())==tid) {
+		if(redisDBHelper.hashHasKey(appName+reqid, "status")) {
 			redisDBHelper.hashPut(appName+reqid, "status", status+"");
+			redisDBHelper.hashPut(appName+reqid, "tid", tid+"");
 			JSONObject jo = new JSONObject();
 			jo.put("status", status);
 			return ResultUtil.success(jo);

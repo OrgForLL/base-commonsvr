@@ -16,8 +16,8 @@ public class RedisController {
 	private ReqRecordService reqRecordService;
 	
 	@PostMapping("/redisInsertInter")
-	private Result<?> redisInsertInter(@RequestParam String appName,@RequestParam String reqid,@RequestParam int tid){
-		return reqRecordService.redisInsertInter(appName, reqid, tid);
+	private Result<?> redisInsertInter(@RequestParam String appName,@RequestParam String reqid){
+		return reqRecordService.redisInsertInter(appName, reqid);
 	}
 	
 	@PostMapping("/redisUpdateInter")
