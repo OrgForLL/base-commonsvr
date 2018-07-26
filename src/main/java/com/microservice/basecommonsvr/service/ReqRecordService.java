@@ -88,7 +88,7 @@ public class ReqRecordService {
 			reqRecord.setStatus(false);
 			putReqRecord(appName, reqRecord);
 			JSONObject jo = new JSONObject();
-			jo.put("reqid", false);
+			jo.put("reqid", true);
 			jo.put("tid", 0);
 			return ResultUtil.success(jo);
 		}else if(findReqRecord(appName + reqid)==1) {
