@@ -47,6 +47,8 @@ public class ReqRecordService {
 	 * @return
 	 */
 	public int findReqRecord(String key) {
+		//失效时间
+		int outSecond = 30;
 		if(!redisDBHelper.hasKey(key)) {
 			return 0;
 		}else {
@@ -55,7 +57,7 @@ public class ReqRecordService {
 				Date newDate = sdf.parse(redisDBHelper.hashGet(key, "reqtime").toString());
 				if(redisDBHelper.hashGet(key, "status").toString().equals("true")) {
 					return 1;
-				}else if((new Date().getTime() - newDate.getTime())/1000>5) {
+				}else if((new Date().getTime() - newDate.getTime())/1000>outSecond) {
 					return 3;
 				}else {
 					return 2;
