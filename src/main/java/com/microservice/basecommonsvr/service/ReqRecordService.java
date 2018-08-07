@@ -5,6 +5,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ public class ReqRecordService {
 	@Autowired
 	RedisDBHelper<String, Object> redisDBHelper;
 
+	private final Logger logger = LogManager.getLogger(ReqRecordService.class);
+	
 	/** 
 	 * 储存一个ReqRecord到一个Map结构中
 	 * @param key 最外层key
@@ -64,12 +68,14 @@ public class ReqRecordService {
 				}
 			} catch (ParseException e) {
 				e.printStackTrace();
+				
 				return 2;
 			}
 		}
 	}
 	
 	/**
+	 * 根据入参保存请求记录
 	 * 根据入参参数判断是否存在 
 	 * 不存在：插入redis记录 返回{errcode:0,errmsg:'',data:{reqid:false,tid:0}} 该请求能处理
 	 * 存在：已处理返回：返回{errcode:0,errmsg:'',data:{reqid:true,tid:@tid}} 该请求已处理可以直接返回结构
@@ -78,7 +84,7 @@ public class ReqRecordService {
 	 * @param key 最外层key
 	 * @param appName 服务名
 	 * @param reqid 请求id
-	 * @return
+	 * @return 请求记录对象
 	 */
 	public Result<?> redisInsertInter(String appName,String reqid){
 		if(findReqRecord(appName + reqid)==0) {
@@ -111,6 +117,14 @@ public class ReqRecordService {
 		}
 	}
 
+	/**
+	 * 根据入参更新redis请求记录
+	 * @param appName 服务名
+	 * @param reqid 请求id
+	 * @param tid 业务id
+	 * @param status 状态
+	 * @return 请求记录对象
+	 */
 	public Result<?> redisUpdateInter(String appName, String reqid, int tid, boolean status) {
 		if(redisDBHelper.hashHasKey(appName+reqid, "status")) {
 			redisDBHelper.hashPut(appName+reqid, "status", status+"");
@@ -119,6 +133,7 @@ public class ReqRecordService {
 			jo.put("status", status);
 			return ResultUtil.success(jo);
 		}else {
+			logger.error(" 更新redis请求记录/n redisUpdateInter/n 指定key下的status不存在");
 			return ResultUtil.error(100, "指定key下的status不存在");
 		}
 	}

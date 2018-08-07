@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false">
+  <!-- <property name="AppName" value="logbackdemo" /> -->
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <pattern>%d{HH:mm:ss.SSS} ${hostName} [%thread] %-5level %logger - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>192.168.35.119:9601</destination>
+        <encoder charset="UTF-8" class="net.logstash.logback.encoder.LogstashEncoder" >
+        </encoder>
+    </appender>
+	<!-- 异步处理 -->
+    <appender name="async" class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold><!-- 默认是：80%以后只保存error级别日志 -->
+        <queueSize>256</queueSize> <!-- 默认队列是：256 -->
+        <appender-ref ref="LOGSTASH" />
+    </appender>
+    <!-- 设置日志级别trace debug info warn error -->
+    
+    <root level="info">                    
+        <appender-ref ref="STDOUT" /> <!-- 测试使用输出到控制台-->
+        <appender-ref ref="async"/>   <!-- 正式输出到ES日志存储-->
+    </root>
+</configuration>

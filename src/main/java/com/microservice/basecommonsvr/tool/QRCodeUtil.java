@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Hashtable;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -17,6 +20,9 @@ import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
  * @author cjj
  */
 public class QRCodeUtil {
+	
+	private static final Logger logger = LogManager.getLogger(QRCodeUtil.class);
+	
 	/**
 	 * 生成包含字符串信息的二维码图片
      * @param outputStream 输出流
@@ -39,8 +45,10 @@ public class QRCodeUtil {
 			MatrixToImageWriter.writeToStream(byteMatrix, imageFormat, outputStream);
 		} catch (WriterException e) {
 			e.printStackTrace();
+			logger.error(" 生成包含字符串信息的二维码图片\n createQrCode\n 写流异常\n"+e);
 		} catch (IOException e) {
 			e.printStackTrace();
+			logger.error(" 生成包含字符串信息的二维码图片\n createQrCode\n io流异常\n"+e);
 		}
     }  
 }
