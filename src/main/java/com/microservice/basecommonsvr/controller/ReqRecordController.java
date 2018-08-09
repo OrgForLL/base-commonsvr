@@ -10,7 +10,7 @@ import com.lilanz.microservice.common.entity.Result;
 import com.microservice.basecommonsvr.service.ReqRecordService;
 
 @RestController
-public class RedisController {
+public class ReqRecordController {
 
 	@Autowired
 	private ReqRecordService reqRecordService;

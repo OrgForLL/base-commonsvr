@@ -2,9 +2,12 @@ package com.microservice.basecommonsvr.mapper;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.connection.DefaultStringRedisConnection;
+import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -54,6 +57,11 @@ public class RedisDBHelper<HK, T> {
 		this.valueOperations = redisTemplate.opsForValue();
 	}
 	
+	public void setDatabase(int dbIndex) {
+		redisTemplate.getConnectionFactory().getConnection().select(dbIndex);
+		hashOperations =  redisTemplate.opsForHash();
+	}
+	
 	public boolean hasKey(String key) {
 		return redisTemplate.hasKey(key);
 	}
@@ -65,6 +73,14 @@ public class RedisDBHelper<HK, T> {
 	
 	public void hashPut(String key, HK hashKey, T domain) {
 		hashOperations.put(key, hashKey, domain);
+	}
+	
+	public Set<HK> hashFindAllKey(String key) {
+		return hashOperations.keys(key);
+	}
+	
+	public List<T> hashFindAllValue(String key){
+		return hashOperations.values(key);
 	}
 
 	public Map<HK, T> hashFindAll(String key) {
