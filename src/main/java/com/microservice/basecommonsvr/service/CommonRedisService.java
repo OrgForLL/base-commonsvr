@@ -154,4 +154,15 @@ public class CommonRedisService {
 			return ResultUtil.error(100, e.getMessage());
 		}
 	}
+
+	/**
+	 * 判断某个键在redis中是否存在
+	 * @param key 键
+	 * @return 是否有该键
+	 */
+	public Result<?> redisKeySearch(String key){
+		JSONObject jo = new JSONObject();
+		jo.put("isHasKey", redisDBHelper.hasKey(key));
+		return ResultUtil.success(jo);
+	}
 }

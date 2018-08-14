@@ -1,6 +1,8 @@
 package com.microservice.basecommonsvr.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -54,5 +56,15 @@ public class CommonRedisController {
 		String searchType = jsonObject.getString("searchType");
 		String data = jsonObject.getString("data");
 		return commonRedisService.redisHashSearch(key, searchType, data);
+	}
+	
+	/**
+	 * 判断某个键在redis中是否存在
+	 * @param key 键
+	 * @return 是否有该键
+	 */
+	@GetMapping("/redisKeySearch/{key}")
+	private Result<?> redisKeySearch(@PathVariable(value = "key") String key){
+		return commonRedisService.redisKeySearch(key);
 	}
 }
