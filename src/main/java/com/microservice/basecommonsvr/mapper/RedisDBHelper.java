@@ -66,6 +66,10 @@ public class RedisDBHelper<HK, T> {
 		return redisTemplate.hasKey(key);
 	}
 	
+	public T valueGet(String key) {
+		return valueOperations.get(key);
+	}
+	
 	public void valueSave(String key,T value) {
 		valueOperations.set(key, value);
 	}

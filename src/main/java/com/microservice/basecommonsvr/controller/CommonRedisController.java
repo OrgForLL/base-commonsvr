@@ -143,4 +143,14 @@ public class CommonRedisController {
 		}
 		return commonRedisService.redisValueSave(key, timeout, value);
 	}
+	
+	/**
+	 * 获取redis中的存储数据
+	 * @param key 键
+	 * @return 值
+	 */
+	@GetMapping("/redisValueGet/{key}")
+	private Result<?> redisValueGet(@PathVariable(value = "key") String key){
+		return commonRedisService.redisValueGet(key);
+	}
 }

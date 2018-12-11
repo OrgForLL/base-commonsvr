@@ -252,6 +252,21 @@ public class CommonRedisService {
 	}
 	
 	/**
+	 * 获取redis中的存储数据
+	 * @param key 键
+	 * @return 值
+	 */
+	public Result<?> redisValueGet(String key){
+		Object value = redisDBHelper.valueGet(key);
+		if(value == null) {
+			logger.error(" 获取redis中的存储数据\n redisValueGet\n redis的指定key下无数据");
+			return ResultUtil.error(100, "redis中不存在该key的数据");
+		}else {
+			return ResultUtil.success(value);
+		}
+	}
+	
+	/**
 	 * 判断某个键在redis中是否存在
 	 * @param key 键
 	 * @return 是否有该键
