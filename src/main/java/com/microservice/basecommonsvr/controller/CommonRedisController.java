@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
@@ -47,7 +48,7 @@ public class CommonRedisController {
 	
 	/**
 	 * redis查询指定业务数据的hash键
-	 * @param jsonObject
+	 * @param jsonObject json对象
 	 * @return 查询结果
 	 */
 	@PostMapping("/redisHashSearch")
@@ -66,5 +67,60 @@ public class CommonRedisController {
 	@GetMapping("/redisKeySearch/{key}")
 	private Result<?> redisKeySearch(@PathVariable(value = "key") String key){
 		return commonRedisService.redisKeySearch(key);
+	}
+	
+	/**
+	 * 以list的方式保存业务数据至redis(右推)
+	 * @param jsonObject json对象
+	 * @return 保存成功
+	 */
+	@PostMapping("/redisListSave")
+	private Result<?> redisListSave(@RequestBody JSONObject jsonObject){
+		String key = jsonObject.getString("key");
+		Long timeout = jsonObject.getLong("timeout");
+		Object data;
+		try {
+			try {
+				data = jsonObject.getJSONObject("data");
+			}catch(Exception e) {
+				data = jsonObject.getJSONArray("data");
+			}
+		} catch (Exception e) {
+			data = null;
+		}
+		if(timeout==null) {
+			timeout = 3600l;
+		}
+		return commonRedisService.redisListSave(key, timeout, data);
+	}
+	
+	/**
+	 * 用redis以list形式左出栈
+	 * @param key key
+	 * @return list的第一个key值
+	 */
+	@GetMapping("/redisListLPop/{key}")
+	private Result<?> redisListLPop(@PathVariable(value = "key") String key){
+		return commonRedisService.redisListLPop(key);
+	}
+	
+	/**
+	 * redis查询指定业务数据的list键
+	 * @param key key
+	 * @return 查询结果
+	 */
+	@GetMapping("/redisListFindAll/{key}")
+	private Result<?> redisListFindAll(@PathVariable(value = "key") String key){
+		return commonRedisService.redisListFindAll(key);
+	}
+	
+	/**
+	 * 移除redis中的存储数据
+	 * @param key key
+	 * @return 执行结果
+	 */
+	@PostMapping("/redisRemove")
+	private Result<?> redisRemove(@RequestParam String key){
+		return commonRedisService.redisRemove(key);
 	}
 }

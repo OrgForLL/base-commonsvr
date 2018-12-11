@@ -96,7 +96,7 @@ public class CommonRedisService {
 	 * @param key 大key
 	 * @param searchType 搜索类型
 	 * @param data 搜索键
-	 * @return
+	 * @return 查询结果
 	 */
 	public Result<?> redisHashSearch(String key,String searchType,String data){
 		try {
@@ -155,6 +155,81 @@ public class CommonRedisService {
 		}
 	}
 
+	/**
+	 * 以list的方式保存业务数据至redis(右推)
+	 * @param key 大key
+	 * @param timeout 超时时间
+	 * @param data 业务数据
+	 * @return 保存成功
+	 */
+	public Result<?> redisListSave(String key,long timeout,Object data){
+		if(null == data) {
+			logger.error(" 用redis以list的方式保存业务数据\n redisListSave\n 转换json数据异常");
+			return ResultUtil.error(100, "转换json数据异常");
+		}
+		try {
+			JSONObject.DEFFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+			redisDBHelper.listPush(key, JSONObject.toJSON(data).toString());
+			redisDBHelper.expire(key, timeout, TimeUnit.SECONDS);
+			return ResultUtil.success("保存成功！");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" 用redis以list的方式保存业务数据\n redisListSave\n"+e);
+			return ResultUtil.error(100, e.getMessage());
+		}
+	}
+	
+	/**
+	 * 用redis以list形式左出栈
+	 * @param key key
+	 * @return list的第一个key值
+	 */
+	public Result<?> redisListLPop(String key) {
+		try {
+			return ResultUtil.success(redisDBHelper.listLPop(key));
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" 用redis以list形式左出栈\n redisListLPop\n"+e);
+			return ResultUtil.error(100, e.getMessage());
+		}
+	}
+	
+	/**
+	 * redis查询指定业务数据的list键
+	 * @param key key
+	 * @return 查询结果
+	 */
+	public Result<?> redisListFindAll(String key){
+		List<?> list = redisDBHelper.listFindAll(key);
+		if(null == list) {
+			logger.error(" 查询redis中的list存储数据\n redisListFindAll\n 指定redis的指定key下无指定的key数据");
+			return ResultUtil.error(100, "查询redis中的list存储数据为空");
+		}else {
+			return ResultUtil.success(list);
+		}
+	}
+	
+	/**
+	 * 移除redis中的存储数据
+	 * @param key key
+	 * @return 执行结果
+	 */
+	public Result<?> redisRemove(String key){
+		if(!redisDBHelper.hasKey(key)) {
+			logger.error(" 移除redis中的存储数据\n redisRemove\n redis的指定key下无数据");
+			return ResultUtil.error(100, "redis中不存在该key");
+		}else {
+			try {
+				redisDBHelper.remove(key);
+				return ResultUtil.success("删除redis下的key成功");
+			} catch (Exception e) {
+				e.printStackTrace();
+				logger.error(" 移除redis中的存储数据\n redisRemove\n 移除redis下的指定key异常");
+				return ResultUtil.error(100, "移除redis下的指定key异常");
+			}
+		}
+	}
+	
 	/**
 	 * 判断某个键在redis中是否存在
 	 * @param key 键
