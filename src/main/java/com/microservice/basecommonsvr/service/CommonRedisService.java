@@ -32,7 +32,7 @@ public class CommonRedisService {
 	 * @param data 业务数据
 	 * @return 保存成功
 	 */
-	public Result<?> redisHashSave(String key,long timeout,JSONObject data){
+	public Result<?> redisHashSave(String key,Long timeout,JSONObject data){
 		try {
 			Set<String> keySet = data.keySet();
 			for(String hashKey:keySet) {
@@ -40,7 +40,8 @@ public class CommonRedisService {
 			}
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.FFF");
 			redisDBHelper.hashPut(key, "createTime", sdf.format(new Date()));
-			redisDBHelper.expire(key, timeout, TimeUnit.SECONDS);
+			if(null != timeout)
+				redisDBHelper.expire(key, timeout, TimeUnit.SECONDS);
 			return ResultUtil.success("保存成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -162,7 +163,7 @@ public class CommonRedisService {
 	 * @param data 业务数据
 	 * @return 保存成功
 	 */
-	public Result<?> redisListSave(String key,long timeout,Object data){
+	public Result<?> redisListSave(String key,Long timeout,Object data){
 		if(null == data) {
 			logger.error(" 用redis以list的方式保存业务数据\n redisListSave\n 转换json数据异常");
 			return ResultUtil.error(100, "转换json数据异常");
@@ -170,7 +171,8 @@ public class CommonRedisService {
 		try {
 			JSONObject.DEFFAULT_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 			redisDBHelper.listPush(key, JSONObject.toJSON(data).toString());
-			redisDBHelper.expire(key, timeout, TimeUnit.SECONDS);
+			if(null != timeout)
+				redisDBHelper.expire(key, timeout, TimeUnit.SECONDS);
 			return ResultUtil.success("保存成功！");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -227,6 +229,25 @@ public class CommonRedisService {
 				logger.error(" 移除redis中的存储数据\n redisRemove\n 移除redis下的指定key异常");
 				return ResultUtil.error(100, "移除redis下的指定key异常");
 			}
+		}
+	}
+	
+	/**
+	 * 保存redis的key
+	 * @param key 键
+	 * @param value 值
+	 * @return 保存结果
+	 */
+	public Result<?> redisValueSave(String key,Long timeout,Object value){
+		try {
+			redisDBHelper.valueSave(key, value);
+			if(null != timeout)
+				redisDBHelper.expire(key, timeout, TimeUnit.SECONDS);
+			return ResultUtil.success("保存成功");
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error(" 移除redis中的存储数据\n redisValueSet\n 保存redis的指定key异常");
+			return ResultUtil.error(100, "保存redis的指定key异常");
 		}
 	}
 	

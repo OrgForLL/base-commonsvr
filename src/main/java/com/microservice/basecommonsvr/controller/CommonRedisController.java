@@ -27,8 +27,9 @@ public class CommonRedisController {
 	private Result<?> redisHashSave(@RequestBody JSONObject jsonObject){
 		String key = jsonObject.getString("key");
 		Long timeout = jsonObject.getLong("timeout");
+		Boolean isUnOut = jsonObject.getBoolean("isUnOut");
 		JSONObject data = jsonObject.getJSONObject("data");
-		if(timeout==null) {
+		if((null == isUnOut || null != isUnOut && !isUnOut) && timeout==null) {
 			timeout = 3600l;
 		}
 		return commonRedisService.redisHashSave(key, timeout, data);
@@ -78,6 +79,7 @@ public class CommonRedisController {
 	private Result<?> redisListSave(@RequestBody JSONObject jsonObject){
 		String key = jsonObject.getString("key");
 		Long timeout = jsonObject.getLong("timeout");
+		Boolean isUnOut = jsonObject.getBoolean("isUnOut");
 		Object data;
 		try {
 			try {
@@ -88,7 +90,7 @@ public class CommonRedisController {
 		} catch (Exception e) {
 			data = null;
 		}
-		if(timeout==null) {
+		if((null == isUnOut || null != isUnOut && !isUnOut) && timeout==null) {
 			timeout = 3600l;
 		}
 		return commonRedisService.redisListSave(key, timeout, data);
@@ -122,5 +124,23 @@ public class CommonRedisController {
 	@PostMapping("/redisRemove")
 	private Result<?> redisRemove(@RequestParam String key){
 		return commonRedisService.redisRemove(key);
+	}
+	
+	/**
+	 * 保存redis的key
+	 * @param key 键
+	 * @param value 值
+	 * @return 保存结果
+	 */
+	@PostMapping("/redisValueSave")
+	private Result<?> redisValueSave(@RequestBody JSONObject jsonObject){
+		String key = jsonObject.getString("key");
+		Object value = jsonObject.getString("value");
+		Long timeout = jsonObject.getLong("timeout");
+		Boolean isUnOut = jsonObject.getBoolean("isUnOut");
+		if((null == isUnOut || null != isUnOut && !isUnOut) && timeout==null) {
+			timeout = 3600l;
+		}
+		return commonRedisService.redisValueSave(key, timeout, value);
 	}
 }

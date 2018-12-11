@@ -66,6 +66,9 @@ public class RedisDBHelper<HK, T> {
 		return redisTemplate.hasKey(key);
 	}
 	
+	public void valueSave(String key,T value) {
+		valueOperations.set(key, value);
+	}
 	
 	public boolean hashHasKey(String key,Object hashKey) {
 		return hashOperations.hasKey(key, hashKey);
