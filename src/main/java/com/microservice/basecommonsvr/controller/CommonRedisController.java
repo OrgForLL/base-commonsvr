@@ -10,13 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.alibaba.fastjson.JSONObject;
 import com.lilanz.microservice.common.entity.Result;
+import com.lilanz.microservice.common.tools.ResultUtil;
 import com.microservice.basecommonsvr.service.CommonRedisService;
+import com.microservice.basecommonsvr.tool.RedisDistributedLock;
 
 @RestController
 public class CommonRedisController {
 
 	@Autowired
 	private CommonRedisService commonRedisService;
+
+	@Autowired
+	private RedisDistributedLock redisDistributedLock;
 	
 	/**
 	 * 以hash的方式保存业务数据至redis
@@ -152,5 +157,44 @@ public class CommonRedisController {
 	@GetMapping("/redisValueGet/{key}")
 	private Result<?> redisValueGet(@PathVariable(value = "key") String key){
 		return commonRedisService.redisValueGet(key);
+	}
+	
+	/**
+	 * 设置redis某键为锁
+	 * @param jsonObject json对象
+	 * @return 上锁结果
+	 */
+	@PostMapping("/redisSetLock")
+	private Result<?> redisSetLock(@RequestBody JSONObject jsonObject){
+		String key = jsonObject.getString("key");
+		String requestId = jsonObject.getString("requestId");
+		Long expire = jsonObject.getLong("expire");
+		//由于是锁操作、这边谨慎操作在没传值的情况下默认一个过期时间60秒
+		if(null == expire) {
+			expire = 60l;
+		}
+		return ResultUtil.success(redisDistributedLock.setLock(key, requestId, expire));
+	}
+
+	/**
+	 * 获得redis某锁键值
+	 * @param key 键
+	 * @return 获得锁结果
+	 */
+	@GetMapping("/redisGetLock/{key}")
+	private Result<?> redisGetLock(@PathVariable(value = "key") String key){
+		return ResultUtil.success(redisDistributedLock.get(key));
+	}
+	
+	/**
+	 * 给redis某键解锁
+	 * @param jsonObject json对象
+	 * @return 解锁结果
+	 */
+	@PostMapping("/redisReleaseLock")
+	private Result<?> redisReleaseLock(@RequestBody JSONObject jsonObject){
+		String key = jsonObject.getString("key");
+		String requestId = jsonObject.getString("requestId");
+		return ResultUtil.success(redisDistributedLock.releaseLock(key, requestId));
 	}
 }
