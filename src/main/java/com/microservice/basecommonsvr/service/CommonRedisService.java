@@ -53,7 +53,7 @@ public class CommonRedisService {
 	/**
 	 * 删除redis中指定业务数据的hash键
 	 * @param key 大key
-	 * @param data 业务数据
+	 * @param data 小key列表
 	 * @return 删除成功
 	 */
 	public Result<?> redisHashDelete(String key,String data){
@@ -88,6 +88,50 @@ public class CommonRedisService {
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(" 删除redis中的hash存储数据\n redisHashDelete\n"+e);
+			return ResultUtil.error(100, e.getMessage());
+		}
+	}
+	
+	/**
+	 * 根据模糊的key删除redis中指定业务数据
+	 * @param vagueKey 模糊大key
+	 * @param data 小key列表
+	 * @return 删除成功
+	 */
+	public Result<?> redisHashMulDelete(String vagueKey, String data){
+		try {
+			String pattern = "*" + vagueKey + "*";
+			Set<String> vagueKeys = redisDBHelper.getKeys(pattern);
+			if(vagueKeys.size() == 0) {
+				logger.error(" 根据模糊的key删除redis中指定业务数据\n redisHashMulDelete\n 指定redis下暂无模糊key的数据");
+				return ResultUtil.error(100, "指定redis下暂无模糊key的数据");
+			}
+			Set<String> keySet;
+			for(String key:vagueKeys) {
+				//如果data为空则删除该key下所有的hashkey
+				if(data==null||data.isEmpty()) {
+					keySet = redisDBHelper.hashFindAllKey(key);
+				}else {
+					keySet = new HashSet<String>();
+					String [] keys = data.split(",");
+					for(int i=0;i<keys.length;i++) {
+						keySet.add(keys[i]);
+					}
+				}
+				for(String hashKey:keySet) {
+					if(redisDBHelper.hashHasKey(key, hashKey)) {
+						redisDBHelper.hashRemove(key, hashKey);
+					}
+				}
+				//如果其他键都被删完了只剩下创建时间、那么也把创建时间删除
+				if(redisDBHelper.hashFindAllKey(key).size()==1 && redisDBHelper.hashHasKey(key, "createTime")) {
+					redisDBHelper.hashRemove(key, "createTime");
+				}
+			}
+			return ResultUtil.success("删除成功！");
+		}catch(Exception e) {
+			e.printStackTrace();
+			logger.error(" 删除redis中的大量hash存储数据\n redisHashMulDelete\n"+e);
 			return ResultUtil.error(100, e.getMessage());
 		}
 	}

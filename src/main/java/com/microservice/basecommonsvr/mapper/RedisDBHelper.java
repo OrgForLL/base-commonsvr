@@ -62,6 +62,10 @@ public class RedisDBHelper<HK, T> {
 		hashOperations =  redisTemplate.opsForHash();
 	}
 	
+	public Set<String> getKeys(String pattern){
+		return redisTemplate.keys(pattern);
+	}
+	
 	public boolean hasKey(String key) {
 		return redisTemplate.hasKey(key);
 	}

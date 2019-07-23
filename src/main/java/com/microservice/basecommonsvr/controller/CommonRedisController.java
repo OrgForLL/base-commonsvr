@@ -53,6 +53,18 @@ public class CommonRedisController {
 	}
 	
 	/**
+	 * 根据模糊的key删除redis中指定业务数据
+	 * @param jsonObject json对象
+	 * @return 删除成功
+	 */
+	@PostMapping("/redisHashMulDelete")
+	private Result<?> redisHashMulDelete(@RequestBody JSONObject jsonObject){
+		String vagueKey = jsonObject.getString("vagueKey");
+		String data = jsonObject.getString("data");
+		return commonRedisService.redisHashMulDelete(vagueKey, data);
+	}
+	
+	/**
 	 * redis查询指定业务数据的hash键
 	 * @param jsonObject json对象
 	 * @return 查询结果
